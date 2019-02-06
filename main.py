@@ -50,6 +50,37 @@ def find_min_max_distances(vectors):
     return min(dist), max(dist)
 
 
+class Bsas:
+    def find_clusters(vectors, theta, max_clusters):
+        clusters = [[vectors[0]]]
+
+        for vector in vectors[1:]:
+
+            # Calculating the distances from each cluster
+            dist = []
+            for cluster in clusters:
+                sub_dist = [
+                    distance.euclidean(vector, c_vec) for c_vec in cluster
+                ]
+
+                dist.append(min(sub_dist))
+
+            # Finding the smallest one
+            min_dist = min(dist)
+
+            # Getting the index of the selected cluster
+            index = dist.index(min(dist))
+
+            if min_dist > theta and len(clusters) < max_clusters:
+                # Create new cluster
+                clusters.append([vector])
+            else:
+                # Append vector to cluster
+                clusters[index].append(vector)
+
+        return clusters
+
+
 ratings = load("data/u.data", "\t")
 users = load("data/u.user", "|")
 movies = load("data/u.item", "|")
