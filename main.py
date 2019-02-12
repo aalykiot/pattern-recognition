@@ -1,12 +1,13 @@
 from random import shuffle
 from scipy.spatial import distance
+from sklearn.cluster import KMeans, AgglomerativeClustering
 
 
 class Bsas():
 
     def calculate_theta(self, theta_min, theta_max, vectors):
-        # print("theta_min: " + str(theta_min))
-        # print("theta_max: " + str(theta_max))
+        print("theta_min: " + str(theta_min))
+        print("theta_max: " + str(theta_max))
         step = 0.1
         S = 5
 
@@ -29,8 +30,13 @@ class Bsas():
 
             theta_current += step
 
+        # Find best theta
+        common = mode_f(cluster_groups)
+        index = cluster_groups.index(common)
+
+        return theta_results[index], common
+
     def find_clusters(self, vectors, theta, max_clusters):
-        # print("Running bsas for theta " + str(theta) + "...")
         clusters = [[vectors[0]]]
 
         for vector in vectors[1:]:
@@ -113,7 +119,7 @@ def create_users_vectors(ratings_data, users_data, movies_data):
 
 
 def find_min_max_distances(vectors):
-    # print("Finding min,max distances...")
+    print("Finding min,max distances...")
     dist = []
 
     # Finding the min,max euclidian distances of the vectors
@@ -123,18 +129,59 @@ def find_min_max_distances(vectors):
     return min(dist), max(dist)
 
 
+def print_clusters(title, clusters):
+    print('\n' + "<------ " + title + " ------>")
+    print("\n==> total clusters: " + str(len(clusters)))
+    for index, cluster in enumerate(clusters):
+        print("\n==> cluster no. " + str(index))
+        print("==> cluster size: " + str(len(cluster)) + " vectors")
+        print("==> cluster vectors: " + str(cluster))
+
+
 # ====== Question 1 ======
+
 ratings = load("data/u.data", "\t")
 users = load("data/u.user", "|")
 movies = load("data/u.item", "|")
 
 vectors = create_users_vectors(ratings, users, movies)
+# vectors = [[1, 1], [2, 1], [100, 105], [102, 100]]  # Testing vectors
+
 
 # ====== Question 2 ======
+
 min_distance, max_distance = find_min_max_distances(vectors)
 
 # Calculating theta upper and lower limits from formula
 theta_min = min_distance + 0.25 * (max_distance - min_distance)
 theta_max = min_distance + 0.75 * (max_distance - min_distance)
 
-Bsas().calculate_theta(theta_min, theta_max, vectors)
+best_theta, max_clusters = Bsas().calculate_theta(theta_min, theta_max, vectors)
+
+b_clusters = Bsas().find_clusters(vectors, best_theta, max_clusters)
+
+print_clusters("Bsas clustering", b_clusters)
+
+
+# ====== Question 3 ======
+
+# K-means clustering
+kmeans = KMeans(n_clusters=max_clusters, random_state=0).fit(vectors)
+
+k_clusters = [[] for i in range(max_clusters)]
+
+for i in range(len(vectors)):
+    k_clusters[kmeans.labels_[i]].append(vectors[i])
+
+print_clusters("K-means clustering", k_clusters)
+
+
+# Hierarchical clustering
+hierarchical = AgglomerativeClustering(n_clusters=max_clusters).fit(vectors)
+
+h_clusters = [[] for i in range(max_clusters)]
+
+for i in range(len(vectors)):
+    h_clusters[hierarchical.labels_[i]].append(vectors[i])
+
+print_clusters("Hierarchical clustering", h_clusters)
