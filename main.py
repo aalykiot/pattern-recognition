@@ -50,8 +50,8 @@ users = load("data/u.user", "|")
 movies = load("data/u.item", "|")
 
 print("\n==> Creating vectors...")
-#vectors = create_users_vectors(ratings, users, movies)
-vectors = [[1, 1], [2, 1], [100, 105], [102, 100]]  # Test vectors
+vectors = create_users_vectors(ratings, users, movies)
+# vectors = [[1, 1], [2, 1], [100, 105], [102, 100]]  # Test vectors
 
 
 # ====== Question 2 ======
