@@ -33,7 +33,6 @@ def create_users_vectors(ratings_data, users_data, movies_data):
 
 
 def find_min_max_distances(vectors):
-    print("Finding min,max distances...")
     dist = []
 
     # Finding the min,max euclidian distances of the vectors
@@ -45,24 +44,29 @@ def find_min_max_distances(vectors):
 
 # ====== Question 1 ======
 
+print("\n==> Loading data...")
 ratings = load("data/u.data", "\t")
 users = load("data/u.user", "|")
 movies = load("data/u.item", "|")
 
-vectors = create_users_vectors(ratings, users, movies)
-# vectors = [[1, 1], [2, 1], [100, 105], [102, 100]]  # Test vectors
+print("\n==> Creating vectors...")
+#vectors = create_users_vectors(ratings, users, movies)
+vectors = [[1, 1], [2, 1], [100, 105], [102, 100]]  # Test vectors
 
 
 # ====== Question 2 ======
 
+print("\n==> Finding min,max distances...")
 min_distance, max_distance = find_min_max_distances(vectors)
 
+print("\n==> Calculating theta...")
 # Calculating theta upper and lower limits from formula
 theta_min = min_distance + 0.25 * (max_distance - min_distance)
 theta_max = min_distance + 0.75 * (max_distance - min_distance)
 
 best_theta, max_clusters = Bsas().calculate_theta(theta_min, theta_max, vectors)
 
+print("\n==> Running bsas algorithm...")
 b_clusters = Bsas().find_clusters(vectors, best_theta, max_clusters)
 
 print_clusters("Bsas clustering", b_clusters)
@@ -71,6 +75,7 @@ print_clusters("Bsas clustering", b_clusters)
 # ====== Question 3 ======
 
 # K-means clustering
+print("\n==> Running K-means algorithm...")
 kmeans = KMeans(n_clusters=max_clusters, random_state=0).fit(vectors)
 
 k_clusters = [[] for i in range(max_clusters)]
@@ -82,6 +87,7 @@ print_clusters("K-means clustering", k_clusters)
 
 
 # Hierarchical clustering
+print("\n==> Running hierarchical algorithm...")
 hierarchical = AgglomerativeClustering(n_clusters=max_clusters).fit(vectors)
 
 h_clusters = [[] for i in range(max_clusters)]

@@ -6,8 +6,6 @@ from .utils import mode_f
 class Bsas():
 
     def calculate_theta(self, theta_min, theta_max, vectors):
-        print("theta_min: " + str(theta_min))
-        print("theta_max: " + str(theta_max))
         step = 0.1
         S = 5
 

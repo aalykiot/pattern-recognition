@@ -11,7 +11,6 @@ def mode_f(L):
 
 
 def load(path, seperator):
-    # print("Loading data...")
     file_data = open(path, "r", encoding="ISO-8859-1").read().split("\n")
     normalized_data = []
 
